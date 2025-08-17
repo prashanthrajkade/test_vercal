@@ -7,7 +7,12 @@ function ContactForm() {
     message: '',
   });
 
-  const [submittedData, setSubmittedData] = useState(null); 
+  const [submittedData, setSubmittedData] = useState(null);
+  const [errors, setErrors] = useState({
+    name: '',
+    email: '',
+    message: '',
+  });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -15,10 +20,42 @@ function ContactForm() {
       ...prevData,
       [name]: value,
     }));
+
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [name]: '',
+    }));
+  };
+
+  const validate = () => {
+    const newErrors = {};
+
+    // Validate name
+    if (!formData.name) {
+      newErrors.name = 'Name is required';
+    }
+
+    if (!formData.email) {
+      newErrors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = 'Email is invalid';
+    }
+
+    if (!formData.message) {
+      newErrors.message = 'Message is required';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (!validate()) {
+      return;
+    }
+
     setSubmittedData(formData);
     console.log('Form submitted:', formData);
     alert('Form submitted!');
@@ -38,6 +75,7 @@ function ContactForm() {
             onChange={handleChange}
             required
           />
+          {errors.name && <p style={{ color: 'red' }}>{errors.name}</p>}
         </div>
 
         <div>
@@ -50,6 +88,7 @@ function ContactForm() {
             onChange={handleChange}
             required
           />
+          {errors.email && <p style={{ color: 'red' }}>{errors.email}</p>}
         </div>
 
         <div>
@@ -61,6 +100,7 @@ function ContactForm() {
             onChange={handleChange}
             required
           />
+          {errors.message && <p style={{ color: 'red' }}>{errors.message}</p>}
         </div>
 
         <button type="submit">Submit</button>
